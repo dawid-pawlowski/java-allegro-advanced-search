@@ -1,0 +1,31 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0" xsi:schemalocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+  <persistence-unit name="allegro-pu" transaction-type="RESOURCE_LOCAL">
+      <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+    <properties>
+      <!-- <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/app" /> -->
+      <!-- <property name="jakarta.persistence.jdbc.user" value="root" /> -->
+      <!-- <property name="jakarta.persistence.jdbc.password" value="root" /> -->
+      
+        <!-- <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:file:C:/data/sample" /> -->
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:~/test" />
+      <property name="jakarta.persistence.jdbc.user" value="sa" />
+      <property name="jakarta.persistence.jdbc.password" value="" />
+      
+      <property name="eclipselink.logging.level" value="INFO"/>
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      
+      <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+      <property name="eclipselink.ddl-generation" value="create-tables" />
+        <property name="eclipselink.ddl-generation.output-mode" value="database" />
+      <!-- <property name="javax.persistence.schema-generation.create-source" value="script"/>
+      <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/create.sql"/>
+      <property name="javax.persistence.schema-generation.drop-source" value="script"/>
+      <property name="javax.persistence.schema-generation.drop-script-source" value="META-INF/drop.sql"/>
+      <property name="javax.persistence.sql-load-script-source" value="META-INF/data.sql"/> -->
+      
+    </properties>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+  </persistence-unit>
+</persistence>
