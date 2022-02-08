@@ -12,9 +12,13 @@ import api.allegro.service.AuthorizationService;
 import api.allegro.service.CategoryService;
 import api.allegro.service.OfferService;
 import api.allegro.service.StatsService;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -73,18 +77,28 @@ public class DashboardController {
         });*/
 
         categoryChoiceBox.setItems(categories);
-        categoryChoiceBox.setOnAction(event -> {
+
+        categoryChoiceBox.setOnAction(this::choiceBoxSelectEventHandler);
+        /*categoryChoiceBox.setOnAction(event -> {
             CategoryBean c = categoryChoiceBox.getSelectionModel().getSelectedItem();
             try {
-                if (!event.isConsumed()) {
+                if (true) {
                     loadCategory(c);
-                } else{
-                    categoryChoiceBox.getSelectionModel().select(c);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+        });*/
+    }
+
+    private void choiceBoxSelectEventHandler(ActionEvent actionEvent) {
+        ChoiceBox<CategoryBean> target = (ChoiceBox<CategoryBean>) actionEvent.getTarget();
+        CategoryBean c = target.getSelectionModel().getSelectedItem();
+        try {
+            loadCategory(c);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -151,10 +165,9 @@ public class DashboardController {
 
     @FXML
     public void loadCategory(CategoryBean selected) throws IOException {
-        //System.out.println(Thread.currentThread().getStackTrace()[2].getMethodName());
+        System.out.println(Thread.currentThread().getStackTrace()[2].getMethodName());
+        categoryChoiceBox.setOnAction(null);
         try {
-
-            if (selected == null) return;
 
             filters.clear();
             categories.clear();
@@ -163,10 +176,11 @@ public class DashboardController {
                 CategoryBean parent = selected.getParent();
                 categories.add(parent);
             }
-
-            if (selected != catSrv.getMainCategory()) {
+            /*if (selected != catSrv.getMainCategory()) {
                 categories.add(selected);
-            }
+
+            }*/
+            categories.add(selected);
             //categoryChoiceBox.getSelectionModel().clearSelection();
             categoryChoiceBox.getSelectionModel().select(selected);
 
@@ -198,6 +212,7 @@ public class DashboardController {
                 }
                 categoryParamNodesContainer.getChildren().add(vBox);
             }
+        categoryChoiceBox.setOnAction(this::choiceBoxSelectEventHandler);
         } catch (AllegroUnauthorizedException e) {
             Alert alert = new Alert(AlertType.WARNING, "Session expired. Please connect app.");
             alert.setHeaderText(null);
