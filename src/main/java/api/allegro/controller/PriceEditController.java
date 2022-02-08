@@ -3,16 +3,17 @@ package api.allegro.controller;
 
 import api.allegro.app.App;
 import api.allegro.entity.OfferEntity;
+import api.allegro.filter.DecimalFilter;
+import api.allegro.filter.IntegerFilter;
 import api.allegro.service.AuthorizationService;
 import api.allegro.service.OfferService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.IntegerStringConverter;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,6 +38,14 @@ public class PriceEditController {
 
         changeTypes.addAll("FIXED AMOUNT", "INCREMENT BY AMOUNT", "DECREMENT BY AMOUNT", "INCREASE BY PERCENTAGE", "DECREASE BY PERCENTAGE");
         changeTypeChoiceBox.setItems(changeTypes);
+
+        TextFormatter<Double> formatter = new TextFormatter<Double>(
+                new DoubleStringConverter(),
+                null,
+                new DecimalFilter()
+        );
+
+        valueTextField.setTextFormatter(formatter);
     }
 
     @FXML

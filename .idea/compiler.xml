@@ -10,8 +10,5 @@
         <module name="javafx-allegro-advanced-search" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="javafx-allegro-advanced-search" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>
