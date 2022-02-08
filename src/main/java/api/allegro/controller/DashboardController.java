@@ -75,12 +75,14 @@ public class DashboardController {
         categoryChoiceBox.setItems(categories);
         categoryChoiceBox.setOnAction(event -> {
             CategoryBean c = categoryChoiceBox.getSelectionModel().getSelectedItem();
-            if (c != null) {
-                try {
+            try {
+                if (!event.isConsumed()) {
                     loadCategory(c);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } else{
+                    categoryChoiceBox.getSelectionModel().select(c);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }
@@ -101,7 +103,7 @@ public class DashboardController {
 
         // position of second window, related to primary window.
         //newWindow.setX(primaryStage.getX() + 200);
-        //newWindow.setY(primaryStage.getY() + 100);
+        //newWindow.setY(primaryStage.getY() + 100);            <scope>test</scope>
 
         offerSrv.matchOffers(filters, categoryChoiceBox.getSelectionModel().getSelectedItem().getId());
         App.getStage().setUserData(offerSrv.getMatchingOffers());
@@ -117,7 +119,6 @@ public class DashboardController {
     @FXML
     public void loadRootCategory() throws IOException {
         try {
-            categories.clear();
             loadCategory(catSrv.getMainCategory());
         } catch (AllegroUnauthorizedException e) {
             Alert alert = new Alert(AlertType.WARNING, "Session expired. Please connect app.");
@@ -150,7 +151,11 @@ public class DashboardController {
 
     @FXML
     public void loadCategory(CategoryBean selected) throws IOException {
+        //System.out.println(Thread.currentThread().getStackTrace()[2].getMethodName());
         try {
+
+            if (selected == null) return;
+
             filters.clear();
             categories.clear();
 
@@ -159,13 +164,15 @@ public class DashboardController {
                 categories.add(parent);
             }
 
-            categories.add(selected);
+            if (selected != catSrv.getMainCategory()) {
+                categories.add(selected);
+            }
             //categoryChoiceBox.getSelectionModel().clearSelection();
             categoryChoiceBox.getSelectionModel().select(selected);
 
             List<CategoryBean> list = catSrv.getCategoryList(selected);
             List<CategoryParamBean> paramList = selected.getParameters();
-
+            //categories.setAll(list);
             categories.addAll(list);
             categoryParamNodesContainer.getChildren().clear();
             for (CategoryParamBean param : paramList) {
