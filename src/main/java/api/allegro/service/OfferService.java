@@ -185,6 +185,19 @@ public class OfferService {
         return paramMap;
     }
 
+    public boolean batchOfferDescriptionChange(List<OfferEntity> offers, String oldValue, String newValue) {
+        /*
+            - iterate over matching offers list
+            - change description in each offer
+            - call allegro api to change
+            - update all offer entities at once (only if change was successful (?))
+         */
+
+        // iterate over matching offers
+        
+        return true;
+    }
+
     // bulk change quantity in matching offers
     public boolean batchOfferQuantityChange(List<OfferEntity> offers, String type, String value) {
         try {

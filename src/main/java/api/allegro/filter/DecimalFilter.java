@@ -6,7 +6,7 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 public class DecimalFilter implements UnaryOperator<TextFormatter.Change> {
-    private final static Pattern PATTERN = Pattern.compile("\\d+(\\.\\d{1,2})?");
+    private final static Pattern PATTERN = Pattern.compile("(([1-9][0-9]*)|0)?((\\.[0-9]*)|0)?");
 
     @Override
     public TextFormatter.Change apply(TextFormatter.Change change) {
