@@ -77,18 +77,7 @@ public class DashboardController {
         });*/
 
         categoryChoiceBox.setItems(categories);
-
         categoryChoiceBox.setOnAction(this::choiceBoxSelectEventHandler);
-        /*categoryChoiceBox.setOnAction(event -> {
-            CategoryBean c = categoryChoiceBox.getSelectionModel().getSelectedItem();
-            try {
-                if (true) {
-                    loadCategory(c);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });*/
     }
 
     private void choiceBoxSelectEventHandler(ActionEvent actionEvent) {
@@ -257,17 +246,17 @@ public class DashboardController {
 
     @FXML
     public void editPrice() throws IOException {
-        App.setRoot("price_edit");
+        App.setRoot("edit");
     }
 
     @FXML
     public void editQuantity() throws IOException {
-        App.setRoot("quantity_edit");
+        App.setRoot("edit");
     }
 
     @FXML
     public void editDescription() throws IOException {
-        App.setRoot("description_edit");
+        App.setRoot("edit");
     }
 
 }

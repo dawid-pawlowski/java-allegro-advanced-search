@@ -2,12 +2,16 @@ package api.allegro.controller;
 
 
 import api.allegro.app.App;
+import api.allegro.bean.ShippingRateBean;
 import api.allegro.converter.RemoveHtmlTagsConverter;
 import api.allegro.entity.OfferEntity;
+import api.allegro.exception.AllegroNotFoundException;
+import api.allegro.exception.AllegroUnauthorizedException;
 import api.allegro.filter.DecimalFilter;
 import api.allegro.filter.IntegerFilter;
 import api.allegro.service.AuthorizationService;
 import api.allegro.service.OfferService;
+import api.allegro.service.ShippingRateService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,30 +30,33 @@ public class EditController {
     @FXML
     private Button processBtn;
     @FXML
-    private TextArea newPriceTxt;
+    private TextField newPriceTxt;
     @FXML
-    private TextArea newQuantityTxt;
+    private TextField newQuantityTxt;
     @FXML
     private ChoiceBox<String> priceModeChoiceBox;
-    private ObservableList<String> priceChangeModes = FXCollections.observableArrayList();
+    private final ObservableList<String> priceChangeModes = FXCollections.observableArrayList();
     @FXML
     private ChoiceBox<String> quantityModeChoiceBox;
-    private ObservableList<String> quantityChangeModes = FXCollections.observableArrayList();
+    private final ObservableList<String> quantityChangeModes = FXCollections.observableArrayList();
     @FXML
     private ChoiceBox<String> publishChoiceBox;
-    private ObservableList<String> publishModes = FXCollections.observableArrayList();
+    private final ObservableList<String> publishModes = FXCollections.observableArrayList();
     @FXML
-    private ChoiceBox<String> shippingRateChoiceBox;
-    private ObservableList<String> shippingRatesList = FXCollections.observableList();
+    private ChoiceBox<ShippingRateBean> shippingRateChoiceBox;
+    private final ObservableList<ShippingRateBean> shippingRatesList = FXCollections.observableArrayList();
 
-    private OfferService offerSrv;
+    private AuthorizationService authorizationService;
+    private OfferService offerService;
+    private ShippingRateService shippingRateService;
 
     @FXML
-    private void initialize() {
+    private void initialize() throws AllegroUnauthorizedException, IOException, InterruptedException {
 
         // TODO: should be inside constructor (?)
-        AuthorizationService authSrv = new AuthorizationService("allegro-pu");
-        offerSrv = new OfferService("allegro-pu", authSrv.getAccessToken());
+        authorizationService = new AuthorizationService("allegro-pu");
+        offerService = new OfferService("allegro-pu", authorizationService.getAccessToken());
+        shippingRateService = new ShippingRateService(authorizationService.getAccessToken());
 
         // TODO: use StringConverter instead of an UnaryOperator
         newPriceTxt.setTextFormatter(new TextFormatter<Float>(
@@ -65,8 +72,25 @@ public class EditController {
                 new IntegerFilter()
         ));
 
+        shippingRateChoiceBox.setItems(shippingRatesList);
 
+        getShippingRates();
+    }
 
+    public void getShippingRates() throws IOException {
+        try {
+            shippingRatesList.addAll(shippingRateService.getShippingRates());
+        } catch (AllegroUnauthorizedException e) {
+            Alert alert = new Alert(AlertType.WARNING, "Session expired. Please connect app.");
+            alert.setHeaderText(null);
+            alert.showAndWait();
+
+            if (alert.getResult() == ButtonType.OK) {
+                App.setRoot("authorization");
+            }
+        } catch (IOException | InterruptedException e) {
+            showAlertWindow(AlertType.WARNING, "IO/Network error. Please try again.");
+        }
     }
 
     @FXML
@@ -75,12 +99,8 @@ public class EditController {
     }
 
     @FXML
-    public void process() {
-        if (offerSrv.batchOfferDescriptionChange((List<OfferEntity>) App.getStage().getUserData(), oldValueTxt.getText(), newValueTxt.getText())) {
-            showAlertWindow(AlertType.INFORMATION, "Success");
-        } else {
-            showAlertWindow(AlertType.ERROR, "Error");
-        }
+    public void process() throws AllegroUnauthorizedException, IOException, InterruptedException {
+        shippingRateService.getShippingRates();
     }
 
     @FXML
