@@ -265,4 +265,9 @@ public class DashboardController {
         App.setRoot("quantity_edit");
     }
 
+    @FXML
+    public void editDescription() throws IOException {
+        App.setRoot("description_edit");
+    }
+
 }

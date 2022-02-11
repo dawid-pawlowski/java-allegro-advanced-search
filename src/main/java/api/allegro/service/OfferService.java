@@ -194,7 +194,6 @@ public class OfferService {
          */
 
         // iterate over matching offers
-        
         return true;
     }
 
