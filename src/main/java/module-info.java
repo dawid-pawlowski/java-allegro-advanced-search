@@ -15,4 +15,5 @@ module api.allegro.app {
     exports api.allegro.converter;
     exports api.allegro.bean;
     exports api.allegro.exception;
+    exports api.allegro.enums;
 }

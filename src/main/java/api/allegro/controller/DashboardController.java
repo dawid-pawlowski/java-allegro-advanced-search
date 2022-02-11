@@ -12,13 +12,10 @@ import api.allegro.service.AuthorizationService;
 import api.allegro.service.CategoryService;
 import api.allegro.service.OfferService;
 import api.allegro.service.StatsService;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -37,21 +34,14 @@ public class DashboardController {
     public ObservableMap<String, List<String>> filters = FXCollections.observableHashMap();
     public ObservableList<CategoryBean> categories = FXCollections.observableArrayList();
     @FXML
-    private Button clearFiltersBtn;
-    @FXML
     private HBox categoryParamNodesContainer;
-    @FXML
-    private Button syncBtn;
     @FXML
     private ChoiceBox<CategoryBean> categoryChoiceBox;
     @FXML
     private Label syncLbl;
     @FXML
     private Label offerCounterLbl;
-    @FXML
-    private TextArea testTxt;
-    @FXML
-    private Button newWndBtn;
+
     private CategoryService catSrv;
     private StatsService statsSrv;
     private OfferService offerSrv;
@@ -91,22 +81,21 @@ public class DashboardController {
     }
 
     @FXML
-    public void showPreviewWnd() throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException {
+    public void showPreviewWnd() {
         TextArea textArea = new TextArea();
 
         StackPane secondaryLayout = new StackPane();
         secondaryLayout.getChildren().add(textArea);
 
         Scene secondScene = new Scene(secondaryLayout, 640, 480);
-
-        // new stage
         Stage newWindow = new Stage();
+
         newWindow.setTitle("Matching offers");
         newWindow.setScene(secondScene);
 
         // position of second window, related to primary window.
         //newWindow.setX(primaryStage.getX() + 200);
-        //newWindow.setY(primaryStage.getY() + 100);            <scope>test</scope>
+        //newWindow.setY(primaryStage.getY() + 100);
 
         offerSrv.matchOffers(filters, categoryChoiceBox.getSelectionModel().getSelectedItem().getId());
         App.getStage().setUserData(offerSrv.getMatchingOffers());
@@ -165,17 +154,17 @@ public class DashboardController {
                 CategoryBean parent = selected.getParent();
                 categories.add(parent);
             }
+
             /*if (selected != catSrv.getMainCategory()) {
                 categories.add(selected);
-
             }*/
+
             categories.add(selected);
-            //categoryChoiceBox.getSelectionModel().clearSelection();
             categoryChoiceBox.getSelectionModel().select(selected);
 
             List<CategoryBean> list = catSrv.getCategoryList(selected);
             List<CategoryParamBean> paramList = selected.getParameters();
-            //categories.setAll(list);
+
             categories.addAll(list);
             categoryParamNodesContainer.getChildren().clear();
             for (CategoryParamBean param : paramList) {
@@ -201,7 +190,7 @@ public class DashboardController {
                 }
                 categoryParamNodesContainer.getChildren().add(vBox);
             }
-        categoryChoiceBox.setOnAction(this::choiceBoxSelectEventHandler);
+            categoryChoiceBox.setOnAction(this::choiceBoxSelectEventHandler);
         } catch (AllegroUnauthorizedException e) {
             Alert alert = new Alert(AlertType.WARNING, "Session expired. Please connect app.");
             alert.setHeaderText(null);
@@ -245,17 +234,7 @@ public class DashboardController {
     }
 
     @FXML
-    public void editPrice() throws IOException {
-        App.setRoot("edit");
-    }
-
-    @FXML
-    public void editQuantity() throws IOException {
-        App.setRoot("edit");
-    }
-
-    @FXML
-    public void editDescription() throws IOException {
+    public void editOffers() throws IOException {
         App.setRoot("edit");
     }
 

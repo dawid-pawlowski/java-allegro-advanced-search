@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
@@ -17,34 +16,15 @@
             <Font size="30.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="categoryChoiceBox" layoutX="128.24423722260514" layoutY="103.0" prefHeight="28.0" prefWidth="461.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+      <ChoiceBox fx:id="categoryChoiceBox" layoutX="128.24423722260514" layoutY="103.0" maxWidth="1.7976931348623157E308" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
       <Label layoutX="14.0" layoutY="79.0" text="Allegro category:" AnchorPane.leftAnchor="10.0" />
-      <Button fx:id="newWndBtn" layoutX="433.08299836352603" layoutY="317.0" mnemonicParsing="false" onAction="#showPreviewWnd" prefHeight="33.0" prefWidth="156.0" text="Preview offers" AnchorPane.rightAnchor="10.0" />
-      <ScrollPane hbarPolicy="NEVER" layoutX="10.0" layoutY="141.0" prefHeight="166.0" prefWidth="580.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+      <Button fx:id="previewOffersBtn" layoutX="433.08299836352603" layoutY="317.0" mnemonicParsing="false" onAction="#showPreviewWnd" text="Preview offers" AnchorPane.rightAnchor="10.0" />
+      <ScrollPane hbarPolicy="NEVER" layoutX="10.0" layoutY="141.0" maxWidth="1.7976931348623157E308" prefHeight="164.0" prefWidth="580.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <content>
-            <HBox fx:id="categoryParamNodesContainer" prefHeight="163.0" prefWidth="580.0" />
+            <HBox fx:id="categoryParamNodesContainer" maxWidth="1.7976931348623157E308" prefHeight="162.0" prefWidth="578.0" />
          </content>
       </ScrollPane>
-      <Button fx:id="clearFiltersBtn" layoutX="10.0" layoutY="317.0" mnemonicParsing="false" onAction="#clearFilters" prefHeight="34.0" prefWidth="54.0" text="Clear" AnchorPane.leftAnchor="10.0" />
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="356.0" prefHeight="66.0" prefWidth="578.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
-         <children>
-            <Button mnemonicParsing="false" onAction="#editPrice" text="Change price">
-               <HBox.margin>
-                  <Insets left="10.0" right="10.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="changeQuantityBtn" mnemonicParsing="false" onAction="#editQuantity" text="Change quantity">
-               <HBox.margin>
-                  <Insets left="10.0" right="10.0" />
-               </HBox.margin>
-            </Button>
-            <Button mnemonicParsing="false" text="Change description" onAction="#editDescription">
-               <HBox.margin>
-                  <Insets left="10.0" right="10.0" />
-               </HBox.margin>
-            </Button>
-         </children>
-      </HBox>
+      <Button fx:id="clearFiltersBtn" layoutX="10.0" layoutY="317.0" mnemonicParsing="false" onAction="#clearFilters" text="Clear" AnchorPane.leftAnchor="10.0" />
       <VBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="388.0" prefHeight="43.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0">
          <children>
             <Label fx:id="offerCounterLbl" text="Offers in database:" />
@@ -52,5 +32,6 @@
          </children>
       </VBox>
       <Button fx:id="syncBtn" layoutX="492.0" layoutY="430.0" mnemonicParsing="false" onAction="#synchronize" text="Synchronize" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+      <Button fx:id="editOffersBtn" layoutX="509.38297997297013" layoutY="354.0" mnemonicParsing="false" onAction="#editOffers" text="Edit offers" AnchorPane.rightAnchor="10.0" />
    </children>
 </AnchorPane>
