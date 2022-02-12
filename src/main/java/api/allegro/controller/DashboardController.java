@@ -182,8 +182,8 @@ public class DashboardController {
                 } else {
                     TextField tf = new TextField();
                     tf.setId(param.getId());
+                    // TODO: allow specific input type
                     tf.setOnAction(event -> {
-                        // TODO: allow specific type (int for integer, float for flat)
                         filters.put(tf.getId(), Collections.singletonList(tf.getText()));
                     });
                     vBox.getChildren().add(tf);

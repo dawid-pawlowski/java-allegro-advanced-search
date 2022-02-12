@@ -10,8 +10,7 @@ public enum PublishChangeModeEnum {
         this.displayName = displayName;
     }
 
-    @Override
-    public String toString() {
+    public String getDisplayName() {
         return displayName;
     }
 }

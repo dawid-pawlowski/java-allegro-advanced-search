@@ -13,8 +13,7 @@ public enum PriceChangeModeEnum {
         this.displayName = displayName;
     }
 
-    @Override
-    public String toString() {
+    public String getDisplayName() {
         return displayName;
     }
 }

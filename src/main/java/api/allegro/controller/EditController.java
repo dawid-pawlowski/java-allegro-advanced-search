@@ -2,7 +2,13 @@ package api.allegro.controller;
 
 
 import api.allegro.app.App;
+import api.allegro.bean.CommandBean;
 import api.allegro.bean.ShippingRateBean;
+import api.allegro.entity.OfferEntity;
+import api.allegro.enums.PriceChangeModeEnum;
+import api.allegro.enums.PublishChangeModeEnum;
+import api.allegro.enums.QuantityChangeModeEnum;
+import api.allegro.exception.AllegroBadRequestException;
 import api.allegro.exception.AllegroUnauthorizedException;
 import api.allegro.filter.DecimalFilter;
 import api.allegro.filter.IntegerFilter;
@@ -18,30 +24,28 @@ import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class EditController {
-
-    private final ObservableList<String> priceChangeModes = FXCollections.observableArrayList();
-    private final ObservableList<String> quantityChangeModes = FXCollections.observableArrayList();
-    private final ObservableList<String> publishModes = FXCollections.observableArrayList();
-    private final ObservableList<ShippingRateBean> shippingRatesList = FXCollections.observableArrayList();
-    // TODO: use enums for change types
-    public ObservableList<String> changeTypes = FXCollections.observableArrayList();
     @FXML
     private TextField newPriceTxt;
     @FXML
     private TextField newQuantityTxt;
     @FXML
-    private ChoiceBox<String> priceModeChoiceBox;
+    private ChoiceBox<PriceChangeModeEnum> priceModeChoiceBox;
     @FXML
-    private ChoiceBox<String> quantityModeChoiceBox;
+    private ChoiceBox<QuantityChangeModeEnum> quantityModeChoiceBox;
     @FXML
-    private ChoiceBox<String> publishChoiceBox;
+    private ChoiceBox<PublishChangeModeEnum> publishChoiceBox;
     @FXML
     private ChoiceBox<ShippingRateBean> shippingRateChoiceBox;
     private AuthorizationService authorizationService;
     private OfferService offerService;
     private ShippingRateService shippingRateService;
+
+    private List<CommandBean> commands = new ArrayList<>();
 
     @FXML
     private void initialize() throws IOException {
@@ -65,14 +69,15 @@ public class EditController {
                 new IntegerFilter()
         ));
 
-        shippingRateChoiceBox.setItems(shippingRatesList);
-
-        getShippingRates();
+        shippingRateChoiceBox.getItems().setAll(getShippingRates());
+        priceModeChoiceBox.getItems().setAll(PriceChangeModeEnum.values());
+        publishChoiceBox.getItems().setAll(PublishChangeModeEnum.values());
+        quantityModeChoiceBox.getItems().setAll(QuantityChangeModeEnum.values());
     }
 
-    public void getShippingRates() throws IOException {
+    public List<ShippingRateBean> getShippingRates() throws IOException {
         try {
-            shippingRatesList.addAll(shippingRateService.getShippingRates());
+            return shippingRateService.getShippingRates();
         } catch (AllegroUnauthorizedException e) {
             Alert alert = new Alert(AlertType.WARNING, "Session expired. Please connect app.");
             alert.setHeaderText(null);
@@ -84,6 +89,8 @@ public class EditController {
         } catch (IOException | InterruptedException e) {
             showAlertWindow(AlertType.WARNING, "IO/Network error. Please try again.");
         }
+
+        return Collections.emptyList();
     }
 
     @FXML
@@ -92,7 +99,20 @@ public class EditController {
     }
 
     @FXML
-    public void process() {
+    public void process() throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
+        if (priceModeChoiceBox.getValue() != null && !newPriceTxt.getText().trim().isEmpty()) {
+            commands.add(offerService.batchOfferPriceChange((List<OfferEntity>) App.getStage().getUserData(), priceModeChoiceBox.getValue(), newPriceTxt.getText()));
+        }
+
+        if (quantityModeChoiceBox.getValue() != null && !newQuantityTxt.getText().trim().isEmpty()) {
+            commands.add(offerService.batchOfferQuantityChange((List<OfferEntity>) App.getStage().getUserData(), quantityModeChoiceBox.getValue(), newQuantityTxt.getText()));
+        }
+
+        if (publishChoiceBox.getValue() != null) {
+            commands.add(offerService.batchOfferPublishChange((List<OfferEntity>) App.getStage().getUserData(), publishChoiceBox.getValue()));
+        }
+
+        System.out.println(shippingRateChoiceBox.getValue());
     }
 
     @FXML

@@ -1,5 +1,9 @@
 package api.allegro.resource;
 
+import api.allegro.bean.CommandBean;
+import api.allegro.enums.PriceChangeModeEnum;
+import api.allegro.enums.PublishChangeModeEnum;
+import api.allegro.enums.QuantityChangeModeEnum;
 import api.allegro.exception.AllegroBadRequestException;
 import api.allegro.exception.AllegroNotFoundException;
 import api.allegro.exception.AllegroUnauthorizedException;
@@ -27,25 +31,7 @@ public class OfferResource {
         headers.put("Accept", "application/vnd.allegro.public.v1+json");
     }
 
-    public JSONObject editOffer(Map<String, Map<String, Object>> offer) throws IOException, InterruptedException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .method("PUT", HttpRequest.BodyPublishers.ofString(offer.toString()))
-                .uri(URI.create("https://api.allegro.pl/sale/offers/" + offer.get("id")));
-
-        Util.addRequestHeaders(builder, headers);
-        HttpRequest request = builder.build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() != 200) {
-            // TODO: implement all exception cases
-            return null;
-        }
-
-        return new JSONObject(response.body());
-    }
-
-    public JSONObject batchOfferPriceChange(List<String> offers, String type, String value) throws IOException, InterruptedException {
+    public JSONObject batchOfferPriceChange(CommandBean command, List<String> offers, PriceChangeModeEnum mode, String value) throws IOException, InterruptedException, AllegroBadRequestException, AllegroUnauthorizedException {
         Map<String, String> offersIdMap = new HashMap<>();
         for (String offer : offers) {
             offersIdMap.put("id", offer);
@@ -61,51 +47,93 @@ public class OfferResource {
         ));
 
         JSONObject modification = new JSONObject();
-        modification.put("type", type);
+        modification.put("type", mode);
 
-        if (type.equals("FIXED_PRICE")) {
+        if (mode.equals(PriceChangeModeEnum.FIXED_PRICE)) {
             modification.put("price", Map.of(
                     "amount", value,
                     "currency", "PLN"
             ));
         }
 
-        if (type.equals("INCREASE_PRICE") || type.equals("DECREASE_PRICE")) {
+        if (mode.equals(PriceChangeModeEnum.INCREASE_PRICE) || mode.equals(PriceChangeModeEnum.DECREASE_PRICE)) {
             modification.put("value", Map.of(
                     "amount", value,
                     "currency", "PLN"
             ));
         }
 
-        if (type.equals("INCREASE_PERCENTAGE") || type.equals("DECREASE_PERCENTAGE")) {
+        if (mode.equals(PriceChangeModeEnum.INCREASE_PERCENTAGE) || mode.equals(PriceChangeModeEnum.DECREASE_PRICE)) {
             modification.put("percentage", value);
         }
 
-        UUID commandId = UUID.randomUUID();
-
         JSONObject payload = new JSONObject();
-        payload.put("commandId", commandId);
         payload.put("modification", modification);
         payload.put("offerCriteria", offerCriteria);
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .method("PUT", HttpRequest.BodyPublishers.ofString(payload.toString()))
-                .uri(URI.create("https://api.allegro.pl/sale/offer-price-change-commands/" + commandId));
+                .uri(URI.create("https://api.allegro.pl/sale/offer-price-change-commands/" + command.getId()));
 
         Util.addRequestHeaders(builder, headers);
         HttpRequest request = builder.build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() != 200) {
-            // TODO: implement all exception cases
-            return null;
+        if (response.statusCode() != 201) {
+            switch (response.statusCode()) {
+                // TODO: implement all exception cases
+                case 400 -> throw new AllegroBadRequestException();
+                case 401, 403 -> throw new AllegroUnauthorizedException();
+            }
         }
 
         return new JSONObject(response.body());
     }
 
-    public JSONObject batchOfferQuantityChange(List<String> offers, String type, String value) throws IOException, InterruptedException {
+    public JSONObject batchOfferPublishChange(CommandBean command, List<String> offers, PublishChangeModeEnum mode) throws AllegroBadRequestException, AllegroUnauthorizedException, IOException, InterruptedException {
+        Map<String, String> offersIdMap = new HashMap<>();
+        for (String offer : offers) {
+            offersIdMap.put("id", offer);
+        }
+
+        JSONArray jsonOffers = new JSONArray();
+        jsonOffers.putAll(offersIdMap);
+
+        JSONArray offerCriteria = new JSONArray();
+        offerCriteria.put(Map.of(
+                "offers", jsonOffers,
+                "type", "CONTAINS_OFFERS"
+        ));
+
+        JSONObject publication = new JSONObject();
+        publication.put("action", mode);
+
+        JSONObject payload = new JSONObject();
+        payload.put("publication", publication);
+        payload.put("offerCriteria", offerCriteria);
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .method("PUT", HttpRequest.BodyPublishers.ofString(payload.toString()))
+                .uri(URI.create("https://api.allegro.pl/sale/offer-quantity-change-commands/" + command.getId()));
+
+        Util.addRequestHeaders(builder, headers);
+        HttpRequest request = builder.build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 201) {
+            switch (response.statusCode()) {
+                // TODO: implement all exception cases
+                case 400 -> throw new AllegroBadRequestException();
+                case 401, 403 -> throw new AllegroUnauthorizedException();
+            }
+        }
+
+        return new JSONObject(response.body());
+    }
+
+    public JSONObject batchOfferQuantityChange(CommandBean command, List<String> offers, QuantityChangeModeEnum mode, String value) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
         Map<String, String> offersIdMap = new HashMap<>();
         for (String offer : offers) {
             offersIdMap.put("id", offer);
@@ -121,28 +149,28 @@ public class OfferResource {
         ));
 
         JSONObject modification = new JSONObject();
-        modification.put("changeType", type);
+        modification.put("changeType", mode);
         modification.put("value", value);
 
-        UUID commandId = UUID.randomUUID();
-
         JSONObject payload = new JSONObject();
-        payload.put("commandId", commandId);
         payload.put("modification", modification);
         payload.put("offerCriteria", offerCriteria);
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .method("PUT", HttpRequest.BodyPublishers.ofString(payload.toString()))
-                .uri(URI.create("https://api.allegro.pl/sale/offer-quantity-change-commands/" + commandId));
+                .uri(URI.create("https://api.allegro.pl/sale/offer-quantity-change-commands/" + command.getId()));
 
         Util.addRequestHeaders(builder, headers);
         HttpRequest request = builder.build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() != 200) {
-            // TODO: implement all exception cases
-            return null;
+        if (response.statusCode() != 201) {
+            switch (response.statusCode()) {
+                // TODO: implement all exception cases
+                case 400 -> throw new AllegroBadRequestException();
+                case 401, 403 -> throw new AllegroUnauthorizedException();
+            }
         }
 
         return new JSONObject(response.body());
@@ -191,5 +219,4 @@ public class OfferResource {
 
         return new JSONObject(response.body());
     }
-
 }
