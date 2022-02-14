@@ -9,8 +9,4 @@ public class CommandService {
     public CommandService(String accessToken) {
         resource = new CommandResource(accessToken);
     }
-
-    public CommandBean getCommand() {
-        return resource.getCommand();
-    }
 }

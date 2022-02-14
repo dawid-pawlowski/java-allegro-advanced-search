@@ -3,13 +3,13 @@ package api.allegro.bean;
 import java.util.UUID;
 
 public class CommandBean {
-    private final UUID id;
+    private final String id;
 
     public CommandBean() {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().toString();
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 }

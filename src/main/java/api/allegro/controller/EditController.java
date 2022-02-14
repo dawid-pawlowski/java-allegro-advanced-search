@@ -15,8 +15,6 @@ import api.allegro.filter.IntegerFilter;
 import api.allegro.service.AuthorizationService;
 import api.allegro.service.OfferService;
 import api.allegro.service.ShippingRateService;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
@@ -112,7 +110,9 @@ public class EditController {
             commands.add(offerService.batchOfferPublishChange((List<OfferEntity>) App.getStage().getUserData(), publishChoiceBox.getValue()));
         }
 
-        System.out.println(shippingRateChoiceBox.getValue());
+        if (shippingRateChoiceBox.getValue() != null) {
+            commands.add(offerService.batchOfferShippingRateChange((List<OfferEntity>) App.getStage().getUserData(), shippingRateChoiceBox.getValue()));
+        }
     }
 
     @FXML

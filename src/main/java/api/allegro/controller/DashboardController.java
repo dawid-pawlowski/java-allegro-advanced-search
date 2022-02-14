@@ -143,7 +143,6 @@ public class DashboardController {
 
     @FXML
     public void loadCategory(CategoryBean selected) throws IOException {
-        System.out.println(Thread.currentThread().getStackTrace()[2].getMethodName());
         categoryChoiceBox.setOnAction(null);
         try {
 

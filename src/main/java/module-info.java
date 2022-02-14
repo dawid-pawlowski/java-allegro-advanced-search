@@ -16,4 +16,5 @@ module api.allegro.app {
     exports api.allegro.bean;
     exports api.allegro.exception;
     exports api.allegro.enums;
+    exports api.allegro.dto;
 }

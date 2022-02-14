@@ -1,6 +1,9 @@
 package api.allegro.service;
 
 import api.allegro.bean.CommandBean;
+import api.allegro.bean.ShippingRateBean;
+import api.allegro.dto.*;
+import api.allegro.dto.PublishModificationDto;
 import api.allegro.entity.OfferEntity;
 import api.allegro.enums.PriceChangeModeEnum;
 import api.allegro.enums.PublishChangeModeEnum;
@@ -18,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class OfferService {
 
@@ -192,27 +194,43 @@ public class OfferService {
     }
 
     public CommandBean batchOfferQuantityChange(List<OfferEntity> offers, QuantityChangeModeEnum mode, String value) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
-        List<String> ids = offers.stream()
-                .map(OfferEntity::getId)
-                .collect(Collectors.toList());
-        JSONObject result = resource.batchOfferQuantityChange(commandService.getCommand(), ids, mode, value);
-        return (CommandBean) result.get("id");
+        OfferChangeDto change = new OfferChangeDto();
+        change.setOfferCriteria(new OfferCriteriaDto(offers));
+        change.addModification(new QuantityModificationDto(mode, value));
+
+        CommandBean command = new CommandBean();
+        //resource.batchOfferQuantityChange(command.getId(), change);
+        return command;
     }
 
     public CommandBean batchOfferPriceChange(List<OfferEntity> offers, PriceChangeModeEnum mode, String value) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
-        List<String> ids = offers.stream()
-                .map(OfferEntity::getId)
-                .collect(Collectors.toList());
-        JSONObject result = resource.batchOfferPriceChange(commandService.getCommand(), ids, mode, value);
-        return (CommandBean) result.get("id");
+        OfferChangeDto change = new OfferChangeDto();
+        change.setOfferCriteria(new OfferCriteriaDto(offers));
+        change.addModification(new PriceModificationDto(mode, value));
+
+        CommandBean command = new CommandBean();
+        //resource.batchOfferPriceChange(command.getId(), change);
+        return command;
     }
 
     public CommandBean batchOfferPublishChange(List<OfferEntity> offers, PublishChangeModeEnum mode) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
-        List<String> ids = offers.stream()
-                .map(OfferEntity::getId)
-                .collect(Collectors.toList());
-        JSONObject result = resource.batchOfferPublishChange(commandService.getCommand(), ids, mode);
-        return (CommandBean) result.get("id");
+        OfferChangeDto change = new OfferChangeDto();
+        change.setOfferCriteria(new OfferCriteriaDto(offers));
+        change.setPublication(new PublishModificationDto(mode));
+
+        CommandBean command = new CommandBean();
+        //resource.batchOfferPublishChange(command.getId(), change);
+        return command;
+    }
+
+    public CommandBean batchOfferShippingRateChange(List<OfferEntity> offers, ShippingRateBean shippingRate) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
+        OfferChangeDto change = new OfferChangeDto();
+        change.setOfferCriteria((new OfferCriteriaDto(offers)));
+        change.addModification(new ShippingRateModificationDto(shippingRate));
+
+        CommandBean command = new CommandBean();
+        //resource.batchOfferModificationChange(command.getId(), change);
+        return command;
     }
 
     class ThreadRunner implements Runnable {
