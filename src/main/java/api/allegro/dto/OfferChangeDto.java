@@ -1,19 +1,35 @@
 package api.allegro.dto;
 
-import org.json.JSONObject;
+public class OfferChangeDto {
 
-import java.util.UUID;
+    private OfferCriteriaDto offerCriteria;
+    private ModificationDto modification;
+    private PublicationModificationDto publication;
 
-public class OfferChangeDto extends JSONObject {
+    public OfferChangeDto() {
+    }
+
+    public OfferCriteriaDto getOfferCriteria() {
+        return offerCriteria;
+    }
+
     public void setOfferCriteria(OfferCriteriaDto offerCriteria) {
-        put("offerCriteria", offerCriteria);
+        this.offerCriteria = offerCriteria;
     }
 
-    public void addModification(JSONObject modification) {
-        accumulate("modification", modification);
+    public ModificationDto getModification() {
+        return modification;
     }
 
-    public void setPublication(JSONObject publication) {
-        put("publication", publication);
+    public void setModification(ModificationDto modification) {
+        this.modification = modification;
+    }
+
+    public PublicationModificationDto getPublication() {
+        return publication;
+    }
+
+    public void setPublication(PublicationModificationDto publication) {
+        this.publication = publication;
     }
 }

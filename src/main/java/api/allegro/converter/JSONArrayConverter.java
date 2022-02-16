@@ -17,6 +17,7 @@ public class JSONArrayConverter implements AttributeConverter<JSONArray, String>
 
     @Override
     public JSONArray convertToEntityAttribute(String s) {
+        if (s == null) return null;
         return new JSONArray(s);
     }
 }

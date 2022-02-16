@@ -47,7 +47,7 @@ public class DashboardController {
     private OfferService offerSrv;
 
     @FXML
-    private void initialize() throws IOException {
+    private void initialize() throws IOException, AllegroUnauthorizedException, AllegroNotFoundException, InterruptedException {
         // TODO: should be inside constructor (?)
         AuthorizationService authSrv = new AuthorizationService("allegro-pu");
         catSrv = new CategoryService("allegro-pu", authSrv.getAccessToken());
@@ -126,7 +126,7 @@ public class DashboardController {
     }
 
     @FXML
-    public void loadOffers() {
+    public void loadOffers() throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException {
         offerSrv.loadAllOffers();
     }
 

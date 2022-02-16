@@ -98,20 +98,23 @@ public class EditController {
 
     @FXML
     public void process() throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
-        if (priceModeChoiceBox.getValue() != null && !newPriceTxt.getText().trim().isEmpty()) {
-            commands.add(offerService.batchOfferPriceChange((List<OfferEntity>) App.getStage().getUserData(), priceModeChoiceBox.getValue(), newPriceTxt.getText()));
-        }
+        List<OfferEntity> matchingOffers =  (List<OfferEntity>) App.getStage().getUserData();
+        if (matchingOffers != null) {
+            if (priceModeChoiceBox.getValue() != null && !newPriceTxt.getText().trim().isEmpty()) {
+                offerService.batchOfferPriceChange((List<OfferEntity>) App.getStage().getUserData(), priceModeChoiceBox.getValue(), newPriceTxt.getText());
+            }
 
-        if (quantityModeChoiceBox.getValue() != null && !newQuantityTxt.getText().trim().isEmpty()) {
-            commands.add(offerService.batchOfferQuantityChange((List<OfferEntity>) App.getStage().getUserData(), quantityModeChoiceBox.getValue(), newQuantityTxt.getText()));
-        }
+            if (quantityModeChoiceBox.getValue() != null && !newQuantityTxt.getText().trim().isEmpty()) {
+                offerService.batchOfferQuantityChange((List<OfferEntity>) App.getStage().getUserData(), quantityModeChoiceBox.getValue(), newQuantityTxt.getText());
+            }
 
-        if (publishChoiceBox.getValue() != null) {
-            commands.add(offerService.batchOfferPublishChange((List<OfferEntity>) App.getStage().getUserData(), publishChoiceBox.getValue()));
-        }
+            if (publishChoiceBox.getValue() != null) {
+                offerService.batchOfferPublishChange((List<OfferEntity>) App.getStage().getUserData(), publishChoiceBox.getValue());
+            }
 
-        if (shippingRateChoiceBox.getValue() != null) {
-            commands.add(offerService.batchOfferShippingRateChange((List<OfferEntity>) App.getStage().getUserData(), shippingRateChoiceBox.getValue()));
+            if (shippingRateChoiceBox.getValue() != null) {
+                offerService.batchOfferShippingRateChange((List<OfferEntity>) App.getStage().getUserData(), shippingRateChoiceBox.getValue());
+            }
         }
     }
 

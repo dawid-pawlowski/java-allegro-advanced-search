@@ -4,20 +4,35 @@ import api.allegro.entity.OfferEntity;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class OfferCriteriaDto extends JSONArray {
+public class OfferCriteriaDto {
 
-    public OfferCriteriaDto(List<OfferEntity> offers) {
-        JSONObject offerCriteriaObj = new JSONObject();
-        offerCriteriaObj.put("type", "CONTAINS_OFFERS");
+    private String type;
+    private List<Map<String, String>> offers;
 
-        JSONArray idArray = new JSONArray();
-        for (OfferEntity offer : offers) {
-            idArray.put(new JSONObject().put("id", offer.getId()));
+    public OfferCriteriaDto() {
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<Map<String, String>> getOffers() {
+        return offers;
+    }
+
+    public void setOffers(List<String> offerIds) {
+        List<Map<String, String>> offers = new ArrayList<>();
+        for (String offerId : offerIds) {
+            offers.add(Map.of("id", offerId));
         }
-
-        offerCriteriaObj.put("offers", idArray);
-        put(offerCriteriaObj);
+        this.offers = offers;
     }
 }

@@ -3,9 +3,26 @@ package api.allegro.dto;
 import api.allegro.enums.QuantityChangeModeEnum;
 import org.json.JSONObject;
 
-public class QuantityModificationDto extends JSONObject {
-    public QuantityModificationDto(QuantityChangeModeEnum mode, String value) {
-        put("changeValue", mode.name());
-        put("value", value);
+public class QuantityModificationDto extends ModificationDto {
+    private String changeValue;
+    private String value;
+
+    public QuantityModificationDto() {
+    }
+
+    public String getChangeValue() {
+        return changeValue;
+    }
+
+    public void setChangeValue(String changeValue) {
+        this.changeValue = changeValue;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

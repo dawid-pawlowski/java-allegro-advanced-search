@@ -9,17 +9,16 @@ import org.json.JSONArray;
 
 @Entity
 @Table(name = "offer")
-public class OfferEntity {
+public class OfferValueEntity {
     @Id
     public String id;
     public String name;
-    @Convert(converter = JSONArrayConverter.class)
-    public JSONArray categories;
+    //@Convert(converter = JSONArrayConverter.class)
+    //public JSONArray categories;
     @Convert(converter = JSONArrayConverter.class)
     public JSONArray parameters;
-    public String category;
 
-    public OfferEntity() {
+    public OfferValueEntity() {
     }
 
     public String getId() {
@@ -38,27 +37,11 @@ public class OfferEntity {
         this.name = name;
     }
 
-    public JSONArray getCategories() {
-        return categories;
-    }
-
-    public void setCategories(JSONArray categories) {
-        this.categories = categories;
-    }
-
     public JSONArray getParameters() {
         return parameters;
     }
 
     public void setParameters(JSONArray parameters) {
         this.parameters = parameters;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 }

@@ -43,7 +43,7 @@ public class CategoryResource {
             switch (response.statusCode()) {
                 case 401 -> throw new AllegroUnauthorizedException();
                 case 404 -> throw new AllegroNotFoundException();
-                default -> throw new IllegalStateException("Unexpected value: " + jsonObject.get("error"));
+                default -> throw new IllegalStateException("Unexpected value: " + jsonObject.get("errors"));
             }
         }
 
@@ -65,7 +65,7 @@ public class CategoryResource {
             switch (response.statusCode()) {
                 case 401 -> throw new AllegroUnauthorizedException();
                 case 404 -> throw new AllegroNotFoundException();
-                default -> throw new IllegalStateException("Unexpected value: " + jsonObject.get("error"));
+                default -> throw new IllegalStateException("Unexpected value: " + jsonObject.get("errors"));
             }
         }
 
@@ -87,7 +87,7 @@ public class CategoryResource {
             switch (response.statusCode()) {
                 case 401 -> throw new AllegroUnauthorizedException();
                 case 404 -> throw new AllegroNotFoundException();
-                default -> throw new IllegalStateException("Unexpected value: " + jsonObject.get("error"));
+                default -> throw new IllegalStateException("Unexpected value: " + jsonObject.get("errors"));
             }
         }
 

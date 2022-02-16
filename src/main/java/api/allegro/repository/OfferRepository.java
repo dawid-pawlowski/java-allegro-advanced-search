@@ -1,6 +1,7 @@
 package api.allegro.repository;
 
 import api.allegro.entity.OfferEntity;
+import api.allegro.entity.OfferValueEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -35,6 +36,11 @@ public class OfferRepository {
         Query query = manager.createQuery("DELETE FROM OfferEntity o");
         query.executeUpdate();
         manager.getTransaction().commit();
+    }
+
+    public List<OfferValueEntity> getOfferValue() {
+        //return manager.createNamedQuery("OfferValue").getResultList();
+        return (List<OfferValueEntity>) manager.createQuery("SELECT o FROM OfferValueEntity o").getResultList();
     }
 
     public List<OfferEntity> getAll() {

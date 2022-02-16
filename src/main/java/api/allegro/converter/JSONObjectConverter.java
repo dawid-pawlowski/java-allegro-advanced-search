@@ -17,6 +17,7 @@ public class JSONObjectConverter implements AttributeConverter<JSONObject, Strin
 
     @Override
     public JSONObject convertToEntityAttribute(String s) {
+        if (s == null) return null;
         return new JSONObject(s);
     }
 }

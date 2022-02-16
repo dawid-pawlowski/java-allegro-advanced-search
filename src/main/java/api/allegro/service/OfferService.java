@@ -3,7 +3,6 @@ package api.allegro.service;
 import api.allegro.bean.CommandBean;
 import api.allegro.bean.ShippingRateBean;
 import api.allegro.dto.*;
-import api.allegro.dto.PublishModificationDto;
 import api.allegro.entity.OfferEntity;
 import api.allegro.enums.PriceChangeModeEnum;
 import api.allegro.enums.PublishChangeModeEnum;
@@ -21,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class OfferService {
 
@@ -74,7 +74,16 @@ public class OfferService {
         // multithreading call to get each offer here
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < offers.size(); i += 50) {
-            Thread thread = new Thread(new ThreadRunner(offers.subList(i, Math.min(offers.size(), i + 50))));
+            List<OfferEntity> subList = offers.subList(i, Math.min(offers.size(), i + 50));
+            Thread thread = new Thread(() -> {
+                subList.forEach(offerEntity -> {
+                    try {
+                        offerEntity = fetchOffer(offerEntity.getId());
+                    } catch (AllegroUnauthorizedException | IOException | AllegroNotFoundException | InterruptedException | AllegroBadRequestException e) {
+                        e.printStackTrace();
+                    }
+                });
+            });
             thread.start();
             threads.add(thread);
         }
@@ -96,12 +105,12 @@ public class OfferService {
 
     // match offers using selected filters
     public void matchOffers(Map<String, List<String>> filters, String categoryId) {
-        matchingOffers.clear();
+        /*matchingOffers.clear();
         for (OfferEntity offer : offers) {
-            if (offer.getParamMap().entrySet().containsAll(filters.entrySet()) && offer.getCategories().contains(categoryId)) {
+            if (offer.getParameters().entrySet().containsAll(filters.entrySet()) && offer.getCategories().contains(categoryId)) {
                 matchingOffers.add(offer);
             }
-        }
+        }*/
     }
 
     // get all matching offers
@@ -118,43 +127,43 @@ public class OfferService {
     private OfferEntity fetchOffer(String offerId) throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException, AllegroBadRequestException {
         OfferEntity offer = new OfferEntity();
         JSONObject response = resource.getOffer(offerId);
-        offer.setAdditionalServices(response.get("additionalServices").toString());
-        offer.setAfterSalesServices(response.get("afterSalesServices").toString());
-        offer.setAttachments(response.get("attachments").toString());
+//        offer.setAdditionalServices(response.get("additionalServices").toString());
+//        offer.setAfterSalesServices(response.get("afterSalesServices").toString());
+//        offer.setAttachments(response.get("attachments").toString());
 
-        offer.setCategory(response.get("category").toString());
-        JSONObject offerCategory = new JSONObject(offer.getCategory());
-        offer.setCategories(parseCategories(offerCategory.getString("id")));
+//        offer.setCategory(response.get("category").toString());
+        JSONObject offerCategory = new JSONObject(response.get("category").toString());
+        offer.setCategories(new JSONArray(parseCategories(offerCategory.getString("id"))));
 
-        offer.setCompatibilityList(response.get("compatibilityList").toString());
-        offer.setContact(response.get("contact").toString());
-        offer.setCreatedAt(response.getString("createdAt"));
-        offer.setCustomParameters(response.get("customParameters").toString());
-        offer.setDelivery(response.get("delivery").toString());
-        offer.setDescription(response.get("description").toString());
-        offer.setDiscounts(response.get("discounts").toString());
-        offer.setExternal(response.get("external").toString());
-        offer.setFundraisingCampaign(response.get("fundraisingCampaign").toString());
+//        offer.setCompatibilityList(response.get("compatibilityList").toString());
+//        offer.setContact(response.get("contact").toString());
+//        offer.setCreatedAt(response.getString("createdAt"));
+//        offer.setCustomParameters(response.get("customParameters").toString());
+//        offer.setDelivery(response.get("delivery").toString());
+//        offer.setDescription(response.get("description").toString());
+//        offer.setDiscounts(response.get("discounts").toString());
+//        offer.setExternal(response.get("external").toString());
+//        offer.setFundraisingCampaign(response.get("fundraisingCampaign").toString());
         offer.setId(response.getString("id"));
-        offer.setImages(response.get("images").toString());
-        offer.setLocation(response.get("location").toString());
+//        offer.setImages(response.get("images").toString());
+//        offer.setLocation(response.get("location").toString());
         offer.setName(response.getString("name"));
 
-        offer.setParameters(response.get("parameters").toString());
-        offer.setParamMap(parseParams((offer.getParameters())));
+        offer.setParameters(new JSONArray(response.get("parameters").toString()));
+//        offer.setParamMap(parseParams((offer.getParameters())));
 
-        offer.setPayments(response.get("payments").toString());
-        offer.setProduct(response.get("product").toString());
-        offer.setPromotion(response.get("promotion").toString());
-        offer.setPublication(response.get("publication").toString());
-        offer.setSellingMode(response.get("sellingMode").toString());
-        offer.setTax(response.get("tax").toString());
-        offer.setSizeTable(response.get("sizeTable").toString());
-        offer.setStock(response.get("stock").toString());
-        offer.setTecdocSpecification(response.get("tecdocSpecification").toString());
-        offer.setB2b(response.get("b2b").toString());
-        offer.setUpdatedAt(response.getString("updatedAt"));
-        offer.setValidation(response.get("validation").toString());
+//        offer.setPayments(response.get("payments").toString());
+//        offer.setProduct(response.get("product").toString());
+//        offer.setPromotion(response.get("promotion").toString());
+//        offer.setPublication(response.get("publication").toString());
+//        offer.setSellingMode(response.get("sellingMode").toString());
+//        offer.setTax(response.get("tax").toString());
+//        offer.setSizeTable(response.get("sizeTable").toString());
+//        offer.setStock(response.get("stock").toString());
+//        offer.setTecdocSpecification(response.get("tecdocSpecification").toString());
+//        offer.setB2b(response.get("b2b").toString());
+//        offer.setUpdatedAt(response.getString("updatedAt"));
+//        offer.setValidation(response.get("validation").toString());
 
         return offer;
     }
@@ -193,44 +202,84 @@ public class OfferService {
         return paramMap;
     }
 
-    public CommandBean batchOfferQuantityChange(List<OfferEntity> offers, QuantityChangeModeEnum mode, String value) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
-        OfferChangeDto change = new OfferChangeDto();
-        change.setOfferCriteria(new OfferCriteriaDto(offers));
-        change.addModification(new QuantityModificationDto(mode, value));
+    public void batchOfferQuantityChange(List<OfferEntity> offers, QuantityChangeModeEnum mode, String value) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
+        OfferCriteriaDto offerCriteriaDto = new OfferCriteriaDto();
+        offerCriteriaDto.setOffers(offers.stream().map(OfferEntity::getId).collect(Collectors.toList()));
 
-        CommandBean command = new CommandBean();
+        QuantityModificationDto quantityModificationDto = new QuantityModificationDto();
+        quantityModificationDto.setChangeValue(mode.name());
+        quantityModificationDto.setValue(value);
+
+        OfferChangeDto offerChangeDto = new OfferChangeDto();
+        offerChangeDto.setModification(quantityModificationDto);
+        offerChangeDto.setOfferCriteria(offerCriteriaDto);
+
+        CommandBean commandBean = commandService.createCommand();
         //resource.batchOfferQuantityChange(command.getId(), change);
-        return command;
     }
 
-    public CommandBean batchOfferPriceChange(List<OfferEntity> offers, PriceChangeModeEnum mode, String value) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
-        OfferChangeDto change = new OfferChangeDto();
-        change.setOfferCriteria(new OfferCriteriaDto(offers));
-        change.addModification(new PriceModificationDto(mode, value));
+    public void batchOfferPriceChange(List<OfferEntity> offers, PriceChangeModeEnum mode, String value) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
+        OfferCriteriaDto offerCriteriaDto = new OfferCriteriaDto();
+        offerCriteriaDto.setOffers(offers.stream().map(OfferEntity::getId).collect(Collectors.toList()));
 
-        CommandBean command = new CommandBean();
+        OfferChangeDto offerChangeDto = new OfferChangeDto();
+        offerChangeDto.setOfferCriteria(offerCriteriaDto);
+
+        switch(mode) {
+            case FIXED_PRICE -> {
+                FixedPriceModificationDto fixedPriceModificationDto = new FixedPriceModificationDto();
+                fixedPriceModificationDto.setType(mode.name());
+                fixedPriceModificationDto.setPrice(value);
+                offerChangeDto.setModification(fixedPriceModificationDto);
+            }
+            case INCREASE_PRICE, DECREASE_PRICE -> {
+                AdjustPriceModificationDto adjustPriceModificationDto = new AdjustPriceModificationDto();
+                adjustPriceModificationDto.setType(mode.name());
+                adjustPriceModificationDto.setValue(value);
+                offerChangeDto.setModification(adjustPriceModificationDto);
+            }
+            case INCREASE_PERCENTAGE, DECREASE_PERCENTAGE -> {
+                AdjustPercentagePriceModificationDto adjustPercentagePriceModificationDto = new AdjustPercentagePriceModificationDto();
+                adjustPercentagePriceModificationDto.setType(mode.name());
+                adjustPercentagePriceModificationDto.setPercentage(value);
+                offerChangeDto.setModification(adjustPercentagePriceModificationDto);
+            }
+        }
+
+        CommandBean commandBean = commandService.createCommand();
         //resource.batchOfferPriceChange(command.getId(), change);
-        return command;
     }
 
-    public CommandBean batchOfferPublishChange(List<OfferEntity> offers, PublishChangeModeEnum mode) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
-        OfferChangeDto change = new OfferChangeDto();
-        change.setOfferCriteria(new OfferCriteriaDto(offers));
-        change.setPublication(new PublishModificationDto(mode));
+    public void batchOfferPublishChange(List<OfferEntity> offers, PublishChangeModeEnum mode) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
+        OfferCriteriaDto offerCriteriaDto = new OfferCriteriaDto();
+        offerCriteriaDto.setOffers(offers.stream().map(OfferEntity::getId).collect(Collectors.toList()));
 
-        CommandBean command = new CommandBean();
-        //resource.batchOfferPublishChange(command.getId(), change);
-        return command;
+        PublicationModificationDto publicationModificationDto = new PublicationModificationDto();
+        publicationModificationDto.setAction(mode.name());
+
+        OfferChangeDto offerChangeDto = new OfferChangeDto();
+        offerChangeDto.setOfferCriteria(offerCriteriaDto);
+        offerChangeDto.setPublication(publicationModificationDto);
+
+        CommandBean commandBean = commandService.createCommand();
+        //resource.batchOfferPublishChange(commandBean.getId(), change);
     }
 
-    public CommandBean batchOfferShippingRateChange(List<OfferEntity> offers, ShippingRateBean shippingRate) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
-        OfferChangeDto change = new OfferChangeDto();
-        change.setOfferCriteria((new OfferCriteriaDto(offers)));
-        change.addModification(new ShippingRateModificationDto(shippingRate));
+    public void batchOfferShippingRateChange(List<OfferEntity> offers, ShippingRateBean shippingRate) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
+        OfferCriteriaDto offerCriteriaDto = new OfferCriteriaDto();
+        offerCriteriaDto.setOffers(offers.stream().map(OfferEntity::getId).collect(Collectors.toList()));
 
-        CommandBean command = new CommandBean();
-        //resource.batchOfferModificationChange(command.getId(), change);
-        return command;
+        OfferDeliveryModificationDto offerDeliveryModificationDto = new OfferDeliveryModificationDto();
+        offerDeliveryModificationDto.setShippingRates(shippingRate.getId());
+
+        OfferModificationDto offerModificationDto = new OfferModificationDto();
+        offerModificationDto.setDelivery(offerDeliveryModificationDto);
+
+        OfferChangeDto offerChangeDto = new OfferChangeDto();
+        offerChangeDto.setOfferCriteria(offerCriteriaDto);
+        offerChangeDto.setModification(offerModificationDto);
+
+        //resource.batchOfferModificationChange(CommandService.createCommand().getId(), new JSONObject(offerChangeDto));
     }
 
     class ThreadRunner implements Runnable {
