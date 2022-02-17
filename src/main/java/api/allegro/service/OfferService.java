@@ -4,6 +4,7 @@ import api.allegro.bean.CommandBean;
 import api.allegro.bean.ShippingRateBean;
 import api.allegro.dto.*;
 import api.allegro.entity.OfferEntity;
+import api.allegro.enums.CommandTypeEnum;
 import api.allegro.enums.PriceChangeModeEnum;
 import api.allegro.enums.PublishChangeModeEnum;
 import api.allegro.enums.QuantityChangeModeEnum;
@@ -202,7 +203,7 @@ public class OfferService {
         return paramMap;
     }
 
-    public void batchOfferQuantityChange(List<OfferEntity> offers, QuantityChangeModeEnum mode, String value) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
+    public void offerQuantityChange(List<OfferEntity> offers, QuantityChangeModeEnum mode, String value) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
         OfferCriteriaDto offerCriteriaDto = new OfferCriteriaDto();
         offerCriteriaDto.setOffers(offers.stream().map(OfferEntity::getId).collect(Collectors.toList()));
 
@@ -214,11 +215,11 @@ public class OfferService {
         offerChangeDto.setModification(quantityModificationDto);
         offerChangeDto.setOfferCriteria(offerCriteriaDto);
 
-        CommandBean commandBean = commandService.createCommand();
-        //resource.batchOfferQuantityChange(command.getId(), change);
+        CommandBean commandBean = CommandService.createCommand(CommandTypeEnum.QUANTITY_CHANGE);
+        resource.offerQuantityChange(commandBean.getId(), new JSONObject(offerChangeDto));
     }
 
-    public void batchOfferPriceChange(List<OfferEntity> offers, PriceChangeModeEnum mode, String value) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
+    public void offerPriceChange(List<OfferEntity> offers, PriceChangeModeEnum mode, String value) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
         OfferCriteriaDto offerCriteriaDto = new OfferCriteriaDto();
         offerCriteriaDto.setOffers(offers.stream().map(OfferEntity::getId).collect(Collectors.toList()));
 
@@ -246,11 +247,11 @@ public class OfferService {
             }
         }
 
-        CommandBean commandBean = commandService.createCommand();
-        //resource.batchOfferPriceChange(command.getId(), change);
+        CommandBean commandBean = CommandService.createCommand(CommandTypeEnum.PRICE_CHANGE);
+        resource.offerPriceChange(commandBean.getId(), new JSONObject(offerChangeDto));
     }
 
-    public void batchOfferPublishChange(List<OfferEntity> offers, PublishChangeModeEnum mode) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
+    public void offerPublication(List<OfferEntity> offers, PublishChangeModeEnum mode) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
         OfferCriteriaDto offerCriteriaDto = new OfferCriteriaDto();
         offerCriteriaDto.setOffers(offers.stream().map(OfferEntity::getId).collect(Collectors.toList()));
 
@@ -261,11 +262,11 @@ public class OfferService {
         offerChangeDto.setOfferCriteria(offerCriteriaDto);
         offerChangeDto.setPublication(publicationModificationDto);
 
-        CommandBean commandBean = commandService.createCommand();
-        //resource.batchOfferPublishChange(commandBean.getId(), change);
+        CommandBean commandBean = CommandService.createCommand(CommandTypeEnum.PUBLICATION_CHANGE);
+        resource.offerPublication(commandBean.getId(), new JSONObject(offerChangeDto));
     }
 
-    public void batchOfferShippingRateChange(List<OfferEntity> offers, ShippingRateBean shippingRate) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
+    public void offerShippingRateChange(List<OfferEntity> offers, ShippingRateBean shippingRate) throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
         OfferCriteriaDto offerCriteriaDto = new OfferCriteriaDto();
         offerCriteriaDto.setOffers(offers.stream().map(OfferEntity::getId).collect(Collectors.toList()));
 
@@ -279,7 +280,8 @@ public class OfferService {
         offerChangeDto.setOfferCriteria(offerCriteriaDto);
         offerChangeDto.setModification(offerModificationDto);
 
-        //resource.batchOfferModificationChange(CommandService.createCommand().getId(), new JSONObject(offerChangeDto));
+        CommandBean commandBean = CommandService.createCommand(CommandTypeEnum.OFFER_MODIFICATION);
+        resource.offerModification(commandBean.getId(), new JSONObject(offerChangeDto));
     }
 
     class ThreadRunner implements Runnable {

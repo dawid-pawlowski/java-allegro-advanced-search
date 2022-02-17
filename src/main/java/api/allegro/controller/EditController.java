@@ -101,21 +101,23 @@ public class EditController {
         List<OfferEntity> matchingOffers =  (List<OfferEntity>) App.getStage().getUserData();
         if (matchingOffers != null) {
             if (priceModeChoiceBox.getValue() != null && !newPriceTxt.getText().trim().isEmpty()) {
-                offerService.batchOfferPriceChange((List<OfferEntity>) App.getStage().getUserData(), priceModeChoiceBox.getValue(), newPriceTxt.getText());
+                offerService.offerPriceChange((List<OfferEntity>) App.getStage().getUserData(), priceModeChoiceBox.getValue(), newPriceTxt.getText());
             }
 
             if (quantityModeChoiceBox.getValue() != null && !newQuantityTxt.getText().trim().isEmpty()) {
-                offerService.batchOfferQuantityChange((List<OfferEntity>) App.getStage().getUserData(), quantityModeChoiceBox.getValue(), newQuantityTxt.getText());
+                offerService.offerQuantityChange((List<OfferEntity>) App.getStage().getUserData(), quantityModeChoiceBox.getValue(), newQuantityTxt.getText());
             }
 
             if (publishChoiceBox.getValue() != null) {
-                offerService.batchOfferPublishChange((List<OfferEntity>) App.getStage().getUserData(), publishChoiceBox.getValue());
+                offerService.offerPublication((List<OfferEntity>) App.getStage().getUserData(), publishChoiceBox.getValue());
             }
 
             if (shippingRateChoiceBox.getValue() != null) {
-                offerService.batchOfferShippingRateChange((List<OfferEntity>) App.getStage().getUserData(), shippingRateChoiceBox.getValue());
+                offerService.offerShippingRateChange((List<OfferEntity>) App.getStage().getUserData(), shippingRateChoiceBox.getValue());
             }
         }
+
+        App.setRoot("summary");
     }
 
     @FXML

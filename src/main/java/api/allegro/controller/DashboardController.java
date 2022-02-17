@@ -20,7 +20,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -34,7 +34,7 @@ public class DashboardController {
     public ObservableMap<String, List<String>> filters = FXCollections.observableHashMap();
     public ObservableList<CategoryBean> categories = FXCollections.observableArrayList();
     @FXML
-    private HBox categoryParamNodesContainer;
+    private FlowPane categoryParamNodesContainer;
     @FXML
     private ChoiceBox<CategoryBean> categoryChoiceBox;
     @FXML
@@ -168,6 +168,7 @@ public class DashboardController {
             categoryParamNodesContainer.getChildren().clear();
             for (CategoryParamBean param : paramList) {
                 VBox vBox = new VBox();
+                vBox.fillWidthProperty();
                 vBox.getChildren().add(new Label(param.getName()));
                 if (param.getType().equals("dictionary")) {
                     ChoiceBox<CategoryParamValueBean> choiceBox = new ChoiceBox<>();

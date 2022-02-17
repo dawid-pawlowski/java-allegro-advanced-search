@@ -25,7 +25,7 @@ public class OfferResource {
         headers.put("Accept", "application/vnd.allegro.public.v1+json");
     }
 
-    public void batchOfferPriceChange(String commandId, JSONObject change) throws IOException, InterruptedException, AllegroBadRequestException, AllegroUnauthorizedException {
+    public void offerPriceChange(String commandId, JSONObject change) throws IOException, InterruptedException, AllegroBadRequestException, AllegroUnauthorizedException {
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .method("PUT", HttpRequest.BodyPublishers.ofString(change.toString()))
@@ -45,7 +45,7 @@ public class OfferResource {
         }
     }
 
-    public void batchOfferPublishChange(String commandId, JSONObject change) throws AllegroBadRequestException, AllegroUnauthorizedException, IOException, InterruptedException {
+    public void offerPublication(String commandId, JSONObject change) throws AllegroBadRequestException, AllegroUnauthorizedException, IOException, InterruptedException {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .method("PUT", HttpRequest.BodyPublishers.ofString(change.toString()))
                 .uri(URI.create("https://api.allegro.pl/sale/offer-publication-commands/" + commandId));
@@ -64,7 +64,7 @@ public class OfferResource {
         }
     }
 
-    public void batchOfferModificationChange(String commandId, JSONObject change) throws IOException, InterruptedException, AllegroBadRequestException, AllegroUnauthorizedException {
+    public void offerModification(String commandId, JSONObject change) throws IOException, InterruptedException, AllegroBadRequestException, AllegroUnauthorizedException {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .method("PUT", HttpRequest.BodyPublishers.ofString(change.toString()))
                 .uri(URI.create("https://api.allegro.pl/sale/offer-modification-commands/" + commandId));
@@ -83,7 +83,7 @@ public class OfferResource {
         }
     }
 
-    public void batchOfferQuantityChange(String commandId, JSONObject change) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
+    public void offerQuantityChange(String commandId, JSONObject change) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .method("PUT", HttpRequest.BodyPublishers.ofString(change.toString()))
                 .uri(URI.create("https://api.allegro.pl/sale/offer-quantity-change-commands/" + commandId));

@@ -1,7 +1,9 @@
 package api.allegro.service;
 
 import api.allegro.bean.CommandBean;
+import api.allegro.enums.CommandTypeEnum;
 import api.allegro.resource.CommandResource;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +16,8 @@ public class CommandService {
         resource = new CommandResource(accessToken);
     }
 
-    public static CommandBean createCommand() {
-        CommandBean commandBean = new CommandBean();
+    public static CommandBean createCommand(CommandTypeEnum type) {
+        CommandBean commandBean = new CommandBean(type);
         commands.add(commandBean);
         return commandBean;
     }
