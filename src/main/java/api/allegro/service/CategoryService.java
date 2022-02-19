@@ -65,8 +65,8 @@ public class CategoryService {
         return rootCategory;
     }
 
-    public ArrayList<String> getCategoryPath(String categoryId) throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException {
-        ArrayList<String> categories = new ArrayList<>();
+    public List<? extends String> getCategoryPath(String categoryId) throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException {
+        List<String> categories = new ArrayList<>();
         JSONObject category = resource.getCategoryById(categoryId);
         if (!category.isNull("parent")) {
             JSONObject parent = new JSONObject(category.get("parent").toString());

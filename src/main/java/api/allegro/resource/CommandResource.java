@@ -1,6 +1,5 @@
 package api.allegro.resource;
 
-import api.allegro.exception.AllegroBadRequestException;
 import api.allegro.exception.AllegroNotFoundException;
 import api.allegro.exception.AllegroUnauthorizedException;
 import api.allegro.util.Util;

@@ -19,7 +19,7 @@
       <Label layoutX="14.0" layoutY="79.0" text="Allegro category:" AnchorPane.leftAnchor="10.0" />
       <Button fx:id="previewOffersBtn" layoutX="433.08299836352603" layoutY="317.0" mnemonicParsing="false" onAction="#showPreviewWnd" text="Preview offers" AnchorPane.rightAnchor="10.0" />
       <Button fx:id="clearFiltersBtn" layoutX="10.0" layoutY="317.0" mnemonicParsing="false" onAction="#clearFilters" text="Clear" AnchorPane.leftAnchor="10.0" />
-      <VBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="388.0" prefHeight="43.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0">
+      <VBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="388.0" prefHeight="43.0" prefWidth="447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0">
          <children>
             <Label fx:id="offerCounterLbl" text="Offers in database:" />
             <Label fx:id="syncLbl" text="Last synchronized:" />

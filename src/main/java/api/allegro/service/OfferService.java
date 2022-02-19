@@ -17,11 +17,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class OfferService {
 
@@ -32,7 +30,7 @@ public class OfferService {
     private final CommandService commandService;
 
     private final List<OfferEntity> offers = new ArrayList<>();
-    private final List<OfferEntity> matchingOffers = new ArrayList<>();
+    private static final List<OfferEntity> matchingOffers = new ArrayList<>();
 
     public OfferService(String pu, String accessToken) {
         resource = new OfferResource(accessToken);
@@ -106,16 +104,16 @@ public class OfferService {
 
     // match offers using selected filters
     public void matchOffers(Map<String, List<String>> filters, String categoryId) {
-        /*matchingOffers.clear();
+        matchingOffers.clear();
         for (OfferEntity offer : offers) {
-            if (offer.getParameters().entrySet().containsAll(filters.entrySet()) && offer.getCategories().contains(categoryId)) {
+            if (offer.getCategories().contains(categoryId) && offer.getParameters().entrySet().containsAll(filters.entrySet())) {
                 matchingOffers.add(offer);
             }
-        }*/
+        }
     }
 
     // get all matching offers
-    public List<OfferEntity> getMatchingOffers() {
+    public static List<OfferEntity> getMatchingOffers() {
         return matchingOffers;
     }
 
@@ -128,79 +126,31 @@ public class OfferService {
     private OfferEntity fetchOffer(String offerId) throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException, AllegroBadRequestException {
         OfferEntity offer = new OfferEntity();
         JSONObject response = resource.getOffer(offerId);
-//        offer.setAdditionalServices(response.get("additionalServices").toString());
-//        offer.setAfterSalesServices(response.get("afterSalesServices").toString());
-//        offer.setAttachments(response.get("attachments").toString());
 
-//        offer.setCategory(response.get("category").toString());
-        JSONObject offerCategory = new JSONObject(response.get("category").toString());
-        offer.setCategories(new JSONArray(parseCategories(offerCategory.getString("id"))));
-
-//        offer.setCompatibilityList(response.get("compatibilityList").toString());
-//        offer.setContact(response.get("contact").toString());
-//        offer.setCreatedAt(response.getString("createdAt"));
-//        offer.setCustomParameters(response.get("customParameters").toString());
-//        offer.setDelivery(response.get("delivery").toString());
-//        offer.setDescription(response.get("description").toString());
-//        offer.setDiscounts(response.get("discounts").toString());
-//        offer.setExternal(response.get("external").toString());
-//        offer.setFundraisingCampaign(response.get("fundraisingCampaign").toString());
         offer.setId(response.getString("id"));
-//        offer.setImages(response.get("images").toString());
-//        offer.setLocation(response.get("location").toString());
         offer.setName(response.getString("name"));
-
-        offer.setParameters(new JSONArray(response.get("parameters").toString()));
-//        offer.setParamMap(parseParams((offer.getParameters())));
-
-//        offer.setPayments(response.get("payments").toString());
-//        offer.setProduct(response.get("product").toString());
-//        offer.setPromotion(response.get("promotion").toString());
-//        offer.setPublication(response.get("publication").toString());
-//        offer.setSellingMode(response.get("sellingMode").toString());
-//        offer.setTax(response.get("tax").toString());
-//        offer.setSizeTable(response.get("sizeTable").toString());
-//        offer.setStock(response.get("stock").toString());
-//        offer.setTecdocSpecification(response.get("tecdocSpecification").toString());
-//        offer.setB2b(response.get("b2b").toString());
-//        offer.setUpdatedAt(response.getString("updatedAt"));
-//        offer.setValidation(response.get("validation").toString());
+        offer.setCategories(parseCategories(response.get("category").toString()));
+        offer.setParameters(parseParamsStreams(response.get("parameters").toString()));
 
         return offer;
     }
 
     // helper method to fetch category tree of current offer
-    private ArrayList<String> parseCategories(String categoryId) throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException {
-        return catSrv.getCategoryPath(categoryId);
+    private List<? extends String> parseCategories(String category) throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException {
+        return catSrv.getCategoryPath(new JSONObject(category).get("id").toString());
     }
 
-    // helper method to parse offer params for quick filtering access
-    private HashMap<String, List<String>> parseParams(String jsonParams) {
-        JSONArray paramArray = new JSONArray(jsonParams);
-        HashMap<String, List<String>> paramMap = new HashMap<>();
-        for (int i = 0; i < paramArray.length(); i++) {
-            JSONObject o = (JSONObject) paramArray.get(i);
-            String paramId = o.getString("id");
-            List<String> paramValues = new ArrayList<>();
-            JSONArray values = o.getJSONArray("values");
-            for (int j = 0; j < values.length(); j++) {
-                paramValues.add(values.getString(j));
-            }
-            JSONArray valuesIds = o.getJSONArray("valuesIds");
-            for (int j = 0; j < valuesIds.length(); j++) {
-                paramValues.add(valuesIds.getString(j));
-            }
-
-            if (!o.isNull("rangeValue")) {
-                JSONObject rangeValue = o.getJSONObject("rangeValue");
-                paramValues.add(rangeValue.getString("from"));
-                paramValues.add(rangeValue.getString("to"));
-            }
-
-            paramMap.put(paramId, paramValues);
-        }
-
-        return paramMap;
+    private Map<String, List<String>> parseParamsStreams(String json) {
+        return ((List<HashMap<String, Object>>) (List<?>) new JSONArray(json).toList()).stream()
+                .collect(Collectors
+                        .toMap(
+                                o -> (String) o.get("id"),
+                                o -> Stream.of(
+                                        (List<String>) o.get("values"),
+                                        (List<String>) o.get("valuesIds"),
+                                        (List<String>) ((o.get("rangeValue") == null) ? Collections.emptyMap().values().stream().toList() : ((Map)o.get("rangeValue)")).values()))
+                                .flatMap(Collection::stream)
+                                .collect(Collectors.toList())));
     }
 
     public void offerQuantityChange(List<OfferEntity> offers, QuantityChangeModeEnum mode, String value) throws IOException, InterruptedException, AllegroUnauthorizedException, AllegroBadRequestException {
@@ -282,26 +232,6 @@ public class OfferService {
 
         CommandBean commandBean = CommandService.createCommand(CommandTypeEnum.OFFER_MODIFICATION);
         resource.offerModification(commandBean.getId(), new JSONObject(offerChangeDto));
-    }
-
-    class ThreadRunner implements Runnable {
-        private final List<OfferEntity> chunk;
-
-        public ThreadRunner(List<OfferEntity> chunk) {
-            this.chunk = chunk;
-        }
-
-        @Override
-        public void run() {
-            for (int i = 0; i < chunk.size(); i++) {
-                try {
-                    chunk.set(i, fetchOffer(chunk.get(i).getId()));
-                } catch (IOException | InterruptedException | AllegroBadRequestException | AllegroUnauthorizedException | AllegroNotFoundException e) {
-                    chunk.set(i, null);
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
 }

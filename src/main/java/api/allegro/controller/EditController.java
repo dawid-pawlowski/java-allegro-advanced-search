@@ -47,7 +47,7 @@ public class EditController {
 
     @FXML
     private void initialize() throws IOException {
-
+        App.getStage().setTitle("Edit offers");
         // TODO: should be inside constructor (?)
         authorizationService = new AuthorizationService("allegro-pu");
         offerService = new OfferService("allegro-pu", authorizationService.getAccessToken());
@@ -98,25 +98,31 @@ public class EditController {
 
     @FXML
     public void process() throws AllegroUnauthorizedException, IOException, InterruptedException, AllegroBadRequestException {
-        List<OfferEntity> matchingOffers =  (List<OfferEntity>) App.getStage().getUserData();
+        List<OfferEntity> matchingOffers = OfferService.getMatchingOffers();
+
         if (matchingOffers != null) {
             if (priceModeChoiceBox.getValue() != null && !newPriceTxt.getText().trim().isEmpty()) {
-                offerService.offerPriceChange((List<OfferEntity>) App.getStage().getUserData(), priceModeChoiceBox.getValue(), newPriceTxt.getText());
+                offerService.offerPriceChange(matchingOffers, priceModeChoiceBox.getValue(), newPriceTxt.getText());
             }
 
             if (quantityModeChoiceBox.getValue() != null && !newQuantityTxt.getText().trim().isEmpty()) {
-                offerService.offerQuantityChange((List<OfferEntity>) App.getStage().getUserData(), quantityModeChoiceBox.getValue(), newQuantityTxt.getText());
+                offerService.offerQuantityChange(matchingOffers, quantityModeChoiceBox.getValue(), newQuantityTxt.getText());
             }
 
             if (publishChoiceBox.getValue() != null) {
-                offerService.offerPublication((List<OfferEntity>) App.getStage().getUserData(), publishChoiceBox.getValue());
+                offerService.offerPublication(matchingOffers, publishChoiceBox.getValue());
             }
 
             if (shippingRateChoiceBox.getValue() != null) {
-                offerService.offerShippingRateChange((List<OfferEntity>) App.getStage().getUserData(), shippingRateChoiceBox.getValue());
+                offerService.offerShippingRateChange(matchingOffers, shippingRateChoiceBox.getValue());
             }
         }
 
+        App.setRoot("summary");
+    }
+
+    @FXML
+    public void showSummary() throws IOException {
         App.setRoot("summary");
     }
 

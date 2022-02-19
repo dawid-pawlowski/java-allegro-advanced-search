@@ -8,6 +8,9 @@ public class CommandBean {
     private final String id;
     private final CommandTypeEnum type;
     private final long timestamp;
+    private int total;
+    private int failed;
+    private int success;
 
     public CommandBean(CommandTypeEnum type) {
         this.type = type;
@@ -25,5 +28,33 @@ public class CommandBean {
 
     public CommandTypeEnum getType() {
         return type;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public int getFailed() {
+        return failed;
+    }
+
+    public void setFailed(int failed) {
+        this.failed = failed;
+    }
+
+    public int getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(int success) {
+        this.success = success;
+    }
+
+    public boolean isSuccessful() {
+        return success == total;
     }
 }

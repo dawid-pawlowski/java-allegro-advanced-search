@@ -31,6 +31,7 @@ public class AuthorizationController {
 
     @FXML
     public void initialize() {
+        App.getStage().setTitle("Authorize application");
         try {
             if (service.getAccessToken() != null) {
                 service.refreshTokens();

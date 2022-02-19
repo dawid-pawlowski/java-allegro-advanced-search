@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -48,6 +49,7 @@ public class DashboardController {
 
     @FXML
     private void initialize() throws IOException, AllegroUnauthorizedException, AllegroNotFoundException, InterruptedException {
+        App.getStage().setTitle("Dashboard");
         // TODO: should be inside constructor (?)
         AuthorizationService authSrv = new AuthorizationService("allegro-pu");
         catSrv = new CategoryService("allegro-pu", authSrv.getAccessToken());
@@ -82,10 +84,7 @@ public class DashboardController {
 
     @FXML
     public void showPreviewWnd() {
-        TextArea textArea = new TextArea();
-
         StackPane secondaryLayout = new StackPane();
-        secondaryLayout.getChildren().add(textArea);
 
         Scene secondScene = new Scene(secondaryLayout, 640, 480);
         Stage newWindow = new Stage();
@@ -93,17 +92,24 @@ public class DashboardController {
         newWindow.setTitle("Matching offers");
         newWindow.setScene(secondScene);
 
+        TableView<OfferEntity> tableView = new TableView<>();
+        TableColumn<OfferEntity, String> idColumn = new TableColumn<>("ID:");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        TableColumn<OfferEntity, String> nameColumn = new TableColumn<>("Name:");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        tableView.getColumns().add(idColumn);
+        tableView.getColumns().add(nameColumn);
+
         // position of second window, related to primary window.
         //newWindow.setX(primaryStage.getX() + 200);
         //newWindow.setY(primaryStage.getY() + 100);
 
         offerSrv.matchOffers(filters, categoryChoiceBox.getSelectionModel().getSelectedItem().getId());
-        App.getStage().setUserData(offerSrv.getMatchingOffers());
+        //App.getStage().setUserData(offerSrv.getMatchingOffers());
 
-        for (OfferEntity matchedOffer : offerSrv.getMatchingOffers()) {
-            // TODO: use StringBuilder
-            textArea.appendText(matchedOffer.getId() + " " + matchedOffer.getName() + "\n");
-        }
+        tableView.getItems().setAll(OfferService.getMatchingOffers());
+        secondaryLayout.getChildren().add(tableView);
 
         newWindow.show();
     }
@@ -126,14 +132,14 @@ public class DashboardController {
     }
 
     @FXML
-    public void loadOffers() throws AllegroUnauthorizedException, IOException, AllegroNotFoundException, InterruptedException {
+    public void loadOffers() {
         offerSrv.loadAllOffers();
     }
 
     @FXML
     public void getStats() {
-        syncLbl.setText(String.valueOf(statsSrv.getUpdateDate()));
-        offerCounterLbl.setText(String.valueOf(statsSrv.getOfferCount()));
+        syncLbl.setText("Last synchronized: " + statsSrv.getUpdateDate());
+        offerCounterLbl.setText("Offers in database: " + statsSrv.getOfferCount());
     }
 
     @FXML
@@ -170,7 +176,7 @@ public class DashboardController {
                 VBox vBox = new VBox();
                 vBox.fillWidthProperty();
                 vBox.getChildren().add(new Label(param.getName()));
-                if (param.getType().equals("dictionary")) {
+                if (param.getValues() != null && !param.getValues().isEmpty()) {
                     ChoiceBox<CategoryParamValueBean> choiceBox = new ChoiceBox<>();
                     choiceBox.setItems(FXCollections.observableList(param.getValues()));
                     choiceBox.setId(param.getId());
@@ -182,7 +188,6 @@ public class DashboardController {
                 } else {
                     TextField tf = new TextField();
                     tf.setId(param.getId());
-                    // TODO: allow specific input type
                     tf.setOnAction(event -> {
                         filters.put(tf.getId(), Collections.singletonList(tf.getText()));
                     });

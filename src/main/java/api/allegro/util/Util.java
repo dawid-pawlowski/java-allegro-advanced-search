@@ -3,7 +3,7 @@ package api.allegro.util;
 import java.net.http.HttpRequest;
 import java.util.Map;
 
-public class Util {
+public final class Util {
     public static HttpRequest.Builder addRequestHeaders(HttpRequest.Builder builder, Map<String, String> headers) {
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             builder.setHeader(entry.getKey(), entry.getValue());

@@ -1,20 +1,22 @@
 package api.allegro.converter;
 
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 import org.json.JSONObject;
 
 import java.util.Map;
 
-public class JSONObjectToMapConverter implements AttributeConverter<Map<String, Object>, String> {
+@Converter(autoApply = true)
+public class JSONObjectToMapConverter<X, Y> implements AttributeConverter<Map<X, Y>, String> {
     @Override
-    public String convertToDatabaseColumn(Map<String, Object> stringObjectMap) {
+    public String convertToDatabaseColumn(Map<X, Y> stringObjectMap) {
         if (stringObjectMap == null) return null;
         return new JSONObject(stringObjectMap).toString();
     }
 
     @Override
-    public Map<String, Object> convertToEntityAttribute(String s) {
+    public Map<X, Y> convertToEntityAttribute(String s) {
         if (s == null) return null;
-        return new JSONObject(s).toMap();
+        return (Map<X, Y>) new JSONObject(s).toMap();
     }
 }

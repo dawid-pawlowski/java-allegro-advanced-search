@@ -1,10 +1,9 @@
 package api.allegro.bean;
 
 
-import java.io.Serializable;
 import java.util.List;
 
-public class CategoryParamBean implements Serializable {
+public class CategoryParamBean {
     private String id;
     private String name;
     // TODO: use enum instead for "type" property (?)

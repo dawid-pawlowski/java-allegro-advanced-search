@@ -1,8 +1,6 @@
 package api.allegro.bean;
 
-import java.io.Serializable;
-
-public class CategoryParamValueBean implements Serializable {
+public class CategoryParamValueBean {
     private String id;
     private String value;
 
