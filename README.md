@@ -1,5 +1,5 @@
 # java-allegro-advanced-search #
-Program dla sprzedających pozwalający na szczegółowe wyszukiwanie ofert oraz ich masową modyfikację (WIP).
+Program dla sprzedających pozwalający na szczegółowe wyszukiwanie ofert oraz ich masową modyfikację.
 Aplikacja pozwala na filtrowanie ofert według wszystkich dostępnych parametrów dla ofert w danej kategorii.
 Systemowa wyszukiwarka ofert na stronie www Allegro pozwala na filtrowanie ofert przy pomocy kilku ogólnych filtrów.
 
